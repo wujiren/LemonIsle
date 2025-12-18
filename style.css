@@ -15,7 +15,7 @@ body {
     color: #333;
 }
 
-/* 手机状态栏 */
+/* 手机状态栏模拟 */
 .status-bar {
     background: #000;
     color: #fff;
@@ -35,11 +35,15 @@ body {
 
 /* 顶部通知条 */
 .toast {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
     background: rgba(255, 255, 255, 0.95);
     padding: 12px 16px;
     margin: 8px 16px;
     border-radius: 12px;
-    display: flex;
+    display: none; /* 由 JS 控制显示 */
     align-items: center;
     gap: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -81,6 +85,7 @@ body {
     flex-direction: column;
     align-items: center;
     transform: translate(-50%, -50%);
+    z-index: 20;
 }
 
 .marker-icon {
@@ -99,12 +104,11 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 学校标记特殊样式 */
 .school .marker-icon { color: #4A90E2; }
 .island .marker-icon { color: #50C878; }
 .home .marker-icon { color: #FF6B6B; }
 
-/* 路径 */
+/* SVG 路径通用设置 */
 .path {
     position: absolute;
     top: 0;
@@ -113,52 +117,81 @@ body {
     z-index: 5;
 }
 
+/* 道路渲染：数值已针对 viewBox="0 0 100 100" 优化 */
+.road-background {
+    stroke-width: 2.5; /* 背景路宽约占 2.5% */
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.road-foreground {
+    stroke-width: 1.2; /* 前景路宽约占 1.2% */
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+/* 1. 学校到安全岛路线 */
 .path-school-to-island .road-background {
     stroke: #FF6B6B;
-    stroke-width: 10px;
     stroke-opacity: 0.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
-
 .path-school-to-island .road-foreground {
     stroke: #FF4444;
-    stroke-width: 6px;
-    stroke-dasharray: none;
     stroke-opacity: 0.9;
-    filter: drop-shadow(0 0 6px rgba(255, 68, 68, 0.5));
+    /* 绘制动画 */
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: drawLine 2s ease forwards;
 }
 
+/* 2. 安全岛到家路线 */
 .path-island-to-home .road-background {
     stroke: #4ECDC4;
-    stroke-width: 10px;
     stroke-opacity: 0.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
-
 .path-island-to-home .road-foreground {
     stroke: #26C6DA;
-    stroke-width: 6px;
-    stroke-dasharray: none;
     stroke-opacity: 0.9;
-    filter: drop-shadow(0 0 6px rgba(38, 198, 218, 0.5));
 }
 
+/* 3. 守护员入场路线 */
 .path-guard-entry .road-background {
     stroke: #45B7D1;
-    stroke-width: 10px;
     stroke-opacity: 0.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
-
 .path-guard-entry .road-foreground {
     stroke: #2196F3;
-    stroke-width: 6px;
-    stroke-dasharray: none;
     stroke-opacity: 0.9;
-    filter: drop-shadow(0 0 6px rgba(33, 150, 243, 0.5));
+}
+
+@keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+}
+
+/* 路名标签：针对 viewBox 优化 */
+.road-label {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 2.5px; /* 在 100x100 坐标系中的字号 */
+    font-weight: 700;
+    fill: #555;
+    paint-order: stroke;
+    stroke: white;
+    stroke-width: 0.4; /* 极细的文字描边，防止遮挡文字 */
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.9;
+}
+
+/* 拐角脉动点：针对 viewBox 优化 */
+.corner-point {
+    animation: cornerPulse 2s ease-in-out infinite;
+}
+
+@keyframes cornerPulse {
+    0%, 100% { r: 0.6; opacity: 1; }
+    50% { r: 1.0; opacity: 0.7; }
 }
 
 /* 角色层 */
@@ -168,7 +201,6 @@ body {
     height: 100%;
 }
 
-/* 角色 */
 .character {
     position: absolute;
     display: flex;
@@ -176,7 +208,7 @@ body {
     align-items: center;
     transform: translate(-50%, -50%);
     transition: all 3s linear;
-    z-index: 10;
+    z-index: 50;
 }
 
 .avatar {
@@ -191,14 +223,12 @@ body {
     position: relative;
 }
 
-/* 孩子头像 - 暖色调 */
 .child-avatar {
     background: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
     color: #FF5252;
     border: 3px solid #FF9A9E;
 }
 
-/* 守护员头像 - 冷色调 */
 .guard-avatar {
     background: linear-gradient(135deg, #A1C4FD 0%, #C2E9FB 100%);
     color: #2196F3;
@@ -284,14 +314,13 @@ body {
     line-height: 1.4;
 }
 
-/* 操作区域 */
 .action-section {
     text-align: center;
 }
 
 .action-btn {
     width: 100%;
-    padding: 20px;
+    padding: 18px;
     border: none;
     border-radius: 16px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -318,8 +347,6 @@ body {
 .action-note {
     font-size: 13px;
     color: #888;
-    text-align: center;
-    line-height: 1.5;
 }
 
 /* 完成模态框 */
@@ -334,7 +361,6 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    animation: fadeIn 0.3s ease;
 }
 
 .modal {
@@ -344,11 +370,6 @@ body {
     max-width: 90%;
     width: 400px;
     animation: scaleIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 
 @keyframes scaleIn {
@@ -367,41 +388,21 @@ body {
     margin-bottom: 16px;
 }
 
-.modal-header h2 {
-    font-size: 24px;
-    color: #333;
-    font-weight: 700;
-}
-
 .service-summary {
     background: #F8F9FA;
     border-radius: 16px;
-    padding: 20px;
+    padding: 16px;
     margin-bottom: 24px;
 }
 
 .summary-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
+    padding: 10px 0;
     border-bottom: 1px solid #EEE;
 }
 
-.summary-item:last-child {
-    border-bottom: none;
-}
-
-.summary-label {
-    color: #666;
-    font-size: 15px;
-}
-
-.summary-value {
-    color: #333;
-    font-weight: 600;
-    font-size: 16px;
-}
+.summary-item:last-child { border-bottom: none; }
 
 .modal-actions {
     display: flex;
@@ -410,140 +411,38 @@ body {
 
 .modal-btn {
     flex: 1;
-    padding: 16px;
+    padding: 14px;
     border: none;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
 }
 
-.confirm-btn {
-    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-    color: white;
-}
+.confirm-btn { background: #4CAF50; color: white; }
+.reset-btn { background: #F1F1F1; color: #333; }
 
-.reset-btn {
-    background: #F1F1F1;
-    color: #333;
-}
-
-.confirm-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-}
-
-.reset-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* 呼吸灯效果 */
+/* 动画特效 */
 @keyframes breathing {
     0%, 100% { transform: translate(-50%, -50%) scale(1); }
     50% { transform: translate(-50%, -50%) scale(1.05); }
 }
+.breathing { animation: breathing 2s ease-in-out infinite; }
 
-.breathing {
-    animation: breathing 2s ease-in-out infinite;
+.time-accelerating {
+    animation: pulse 0.5s ease-in-out infinite;
+    color: #FF6B6B;
 }
 
-/* 时间加速动画 */
-@keyframes timeAccelerate {
+@keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
 }
 
-.time-accelerating {
-    animation: timeAccelerate 0.5s ease-in-out infinite;
-    color: #FF6B6B;
-    font-weight: 700;
-}
-
-/* 响应式调整 */
+/* 响应式适配 */
 @media (max-width: 480px) {
-    .state-info {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-
-    .modal {
-        padding: 24px;
-        width: 95%;
-    }
-
-    .modal-actions {
-        flex-direction: column;
-    }
-
-    .avatar {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-    }
-
-    .character-label {
-        font-size: 12px;
-        padding: 3px 10px;
-    }
-}
-
-/* 角色移动时的脉动效果 */
-@keyframes pulse {
-    0% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-    50% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
-    100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
-}
-
-.character.moving .avatar {
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-/* 路名标签样式 */
-.road-label {
-    font-family: 'Noto Sans SC', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    fill: #666;
-    paint-order: stroke;
-    stroke: white;
-    stroke-width: 3px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: 0.8;
-}
-
-/* 当前路名状态样式 */
-.current-road {
-    color: #FF6B6B;
-    font-weight: 700;
-}
-
-/* 拐角点样式 */
-.corner-point {
-    animation: cornerPulse 2s ease-in-out infinite;
-}
-
-@keyframes cornerPulse {
-    0%, 100% {
-        r: 4;
-        opacity: 1;
-    }
-    50% {
-        r: 6;
-        opacity: 0.8;
-    }
-}
-
-/* 调试：确保道路可见 */
-.road-foreground {
-    stroke: yellow !important;
-    stroke-width: 10px !important;
-    stroke-opacity: 1 !important;
+    .state-info { grid-template-columns: 1fr; gap: 8px; }
+    .avatar { width: 50px; height: 50px; font-size: 24px; }
+    .character-label { font-size: 12px; }
 }

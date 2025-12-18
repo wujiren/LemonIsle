@@ -49,40 +49,34 @@
                 <div class="marker-label">家</div>
             </div>
 
-            <!-- 路径：学校到安全岛（多段路线） -->
-            <svg class="path path-school-to-island" width="100%" height="100%">
-                <!-- 校门路（水平道路） -->
-                <!-- 背景实线道路 -->
-                <path class="road-background" d="M10% 10% L35% 10%" fill="none"/>
-                <!-- 前景虚线道路 -->
-                <path class="road-foreground" d="M10% 10% L35% 10%" fill="none"/>
-                <text x="22.5%" y="9%" text-anchor="middle" class="road-label">校门路</text>
-                <!-- 校门路拐角点 -->
-                <circle cx="35%" cy="10%" r="4" fill="#FF6B6B" stroke="white" stroke-width="1" class="corner-point"/>
+            <!-- 路径：学校到安全岛 -->
+            <svg class="path path-school-to-island" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path class="road-background" d="M10 10 L35 10" fill="none"/>
+                <path class="road-foreground" d="M10 10 L35 10" fill="none"/>
+                <!-- 校门路：移除 % -->
+                <path class="road-background" d="M10 10 L35 10" fill="none"/>
+                <path class="road-foreground" d="M10 10 L35 10" fill="none"/>
+                
+                <!-- 使用百分比定位文本和点（这些属性是支持百分比的，或者改用 0-100 的数值） -->
+                <text x="22.5" y="9" text-anchor="middle" class="road-label">校门路</text>
+                <circle cx="35" cy="10" r="1" fill="#FF6B6B" stroke="white" stroke-width="0.2" class="corner-point"/>
 
-                <!-- 彩虹路（斜向道路） -->
-                <!-- 背景实线道路 -->
-                <path class="road-background" d="M35% 10% L50% 40%" fill="none"/>
-                <!-- 前景虚线道路 -->
-                <path class="road-foreground" d="M35% 10% L50% 40%" fill="none"/>
-                <text x="42.5%" y="25%" text-anchor="middle" class="road-label">彩虹路</text>
-                <!-- 彩虹路拐角点 -->
-                <circle cx="50%" cy="40%" r="4" fill="#FF6B6B" stroke="white" stroke-width="1" class="corner-point"/>
+                <!-- 彩虹路 -->
+                <path class="road-background" d="M35 10 L50 40" fill="none"/>
+                <path class="road-foreground" d="M35 10 L50 40" fill="none"/>
+                <text x="42.5" y="25" text-anchor="middle" class="road-label">彩虹路</text>
+                <circle cx="50" cy="40" r="1" fill="#FF6B6B" stroke="white" stroke-width="0.2" class="corner-point"/>
 
-                <!-- 公园入口路（斜向道路） -->
-                <!-- 背景实线道路 -->
-                <path class="road-background" d="M50% 40% L50% 45%" fill="none"/>
-                <!-- 前景虚线道路 -->
-                <path class="road-foreground" d="M50% 40% L50% 45%" fill="none"/>
-                <text x="50%" y="42.5%" text-anchor="middle" class="road-label">公园入口</text>
+                <!-- 公园入口路 -->
+                <path class="road-background" d="M50 40 L50 45" fill="none"/>
+                <path class="road-foreground" d="M50 40 L50 45" fill="none"/>
+                <text x="50" y="42.5" text-anchor="middle" class="road-label">公园入口</text>
             </svg>
 
-            <!-- 路径：安全岛到家（回家路） -->
-            <svg class="path path-island-to-home" width="100%" height="100%">
-                <!-- 背景实线道路 -->
-                <path class="road-background" d="M50% 45% Q65% 60% 80% 80%" fill="none"/>
-                <!-- 前景虚线道路 -->
-                <path class="road-foreground" d="M50% 45% Q65% 60% 80% 80%" fill="none"/>
+            <!-- 路径：安全岛到家（同样修改） -->
+            <svg class="path path-island-to-home" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path class="road-background" d="M50 45 Q65 60 80 80" fill="none"/>
+                <path class="road-foreground" d="M50 45 Q65 60 80 80" fill="none"/>
             </svg>
 
             <!-- 路径：守护员入场 -->
