@@ -477,6 +477,59 @@ body {
     font-size: 16px;
 }
 
+/* NFC打卡点样式 */
+.nfc-point {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+}
+
+.nfc-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+    animation: nfcPulse 2s ease-in-out infinite;
+}
+
+.nfc-label {
+    background: rgba(156, 39, 176, 0.9); /* 紫色主题 */
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* NFC动画 */
+@keyframes nfcPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.nfc-scanning {
+    animation: scanning 1s ease-in-out infinite;
+}
+
+@keyframes scanning {
+    0%, 100% { color: #9C27B0; }
+    50% { color: #E91E63; }
+}
+
+.nfc-success {
+    animation: success 0.5s ease;
+    color: #4CAF50;
+}
+
+@keyframes success {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+
 /* 动画特效 */
 @keyframes breathing {
     0%, 100% { transform: translate(-50%, -50%) scale(1); }

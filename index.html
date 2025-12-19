@@ -38,7 +38,7 @@
             </div>
 
             <!-- 地点标记：安全岛 -->
-            <div class="location-marker island" style="top: 45%; left: 50%;">
+            <div class="location-marker island" style="top: 50%; left: 55%;">
                 <div class="marker-icon">🎡</div>
                 <div class="marker-label">安全岛</div>
             </div>
@@ -47,6 +47,18 @@
             <div class="location-marker home" style="top: 80%; left: 80%;">
                 <div class="marker-icon">🏠</div>
                 <div class="marker-label">家</div>
+            </div>
+
+            <!-- NFC打卡点：公园入口 -->
+            <div class="nfc-point park-entry" id="nfc-entry" style="top: 47.5%; left: 50%;">
+                <div class="nfc-icon">📍</div>
+                <div class="nfc-label">NFC入口</div>
+            </div>
+
+            <!-- NFC打卡点：公园出口 -->
+            <div class="nfc-point park-exit" id="nfc-exit" style="top: 55%; left: 60%;">
+                <div class="nfc-icon">📍</div>
+                <div class="nfc-label">NFC出口</div>
             </div>
 
             <!-- 路径：学校到安全岛 -->
@@ -68,23 +80,23 @@
                 <circle cx="50" cy="40" r="1" fill="#FF6B6B" stroke="white" stroke-width="0.2" class="corner-point"/>
 
                 <!-- 公园入口路 -->
-                <path class="road-background" d="M50 40 L50 45" fill="none"/>
-                <path class="road-foreground" d="M50 40 L50 45" fill="none"/>
-                <text x="50" y="42.5" text-anchor="middle" class="road-label">公园入口</text>
+                <path class="road-background" d="M50 40 L50 47.5 L55 50" fill="none"/>
+                <path class="road-foreground" d="M50 40 L50 47.5 L55 50" fill="none"/>
+                <text x="50" y="43.75" text-anchor="middle" class="road-label">公园入口</text>
             </svg>
 
             <!-- 路径：安全岛到家（同样修改） -->
             <svg class="path path-island-to-home" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path class="road-background" d="M50 45 Q65 60 80 80" fill="none"/>
-                <path class="road-foreground" d="M50 45 Q65 60 80 80" fill="none"/>
+                <path class="road-background" d="M55 50 Q67 62 80 80" fill="none"/>
+                <path class="road-foreground" d="M55 50 Q67 62 80 80" fill="none"/>
             </svg>
 
             <!-- 路径：守护员入场 -->
             <svg class="path path-guard-entry" width="100%" height="100%">
                 <!-- 背景实线道路 -->
-                <path class="road-background" d="M10% 80% Q30% 65% 50% 45%" fill="none"/>
+                <path class="road-background" d="M10% 80% Q30% 65% 55% 50%" fill="none"/>
                 <!-- 前景虚线道路 -->
-                <path class="road-foreground" d="M10% 80% Q30% 65% 50% 45%" fill="none"/>
+                <path class="road-foreground" d="M10% 80% Q30% 65% 55% 50%" fill="none"/>
             </svg>
         </div>
 
@@ -139,6 +151,10 @@
                 <div class="info-item">
                     <i class="fas fa-stopwatch"></i>
                     <span>停留: <span id="stay-time">0分钟</span></span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-nfc-symbol"></i>
+                    <span>打卡: <span id="nfc-status">⭕️ 未入园 | ⭕️ 未离园</span></span>
                 </div>
             </div>
 

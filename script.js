@@ -12,13 +12,16 @@ const APP_STATE = {
 // Mock数据
 const MAP_POINTS = {
     school: { top: "10%", left: "10%" },
-    island: { top: "45%", left: "50%" },
+    island: { top: "50%", left: "55%" },      // 安全岛位置（向右下移动）
     home: { top: "80%", left: "80%" },
     guardSpawn: { top: "80%", left: "10%" },
     parentSpawn: { top: "10%", left: "80%" }, // 家长出生点（右上角）
     // 学校到安全岛的中间点
     road1: { top: "10%", left: "35%" },   // 校门路终点（水平道路终点）
-    road2: { top: "40%", left: "50%" }    // 彩虹路终点
+    road2: { top: "40%", left: "50%" },    // 彩虹路终点
+    // NFC打卡点
+    parkEntry: { top: "47.5%", left: "50%" },  // 公园入口 NFC打卡点（安全岛左上方）
+    parkExit: { top: "55%", left: "60%" }      // 公园出口 NFC打卡点（更靠近安全岛）
 };
 
 // 守护员信息
@@ -35,6 +38,11 @@ let timeAcceleration = 10; // 时间加速倍数（每秒跳过10分钟）
 
 // 当前状态
 let currentState = APP_STATE.PHASE_0_READY;
+// NFC打卡状态
+let nfcStatus = {
+    entry: false,  // 是否已入园
+    exit: false    // 是否已离园
+};
 
 // DOM元素
 const childCharacter = document.getElementById('child-character');
@@ -60,6 +68,7 @@ const finishBtn = document.getElementById('finish-btn');
 const selfPickupBtn = document.getElementById('self-pickup-btn');
 const selfPickupText = document.getElementById('self-pickup-text');
 const parentArrivalTime = document.getElementById('parent-arrival-time');
+const nfcStatusElement = document.getElementById('nfc-status');
 
 // 工具函数：格式化时间 (HH:MM)
 function formatTime(minutes) {
@@ -78,6 +87,43 @@ function showToast(message, duration = 3000) {
         setTimeout(() => {
             toast.style.display = 'none';
         }, duration);
+    }
+}
+
+// NFC打卡函数
+async function triggerNFCCheck(pointType) {
+    const nfcPoint = document.getElementById(`nfc-${pointType}`);
+    const message = pointType === 'entry' ? '入园打卡' : '离园打卡';
+
+    // 开始扫描动画
+    nfcPoint.classList.add('nfc-scanning');
+    showToast(`📱 ${message}识别中...`, 2000);
+
+    // 模拟NFC识别延迟
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // 扫描成功
+    nfcPoint.classList.remove('nfc-scanning');
+    nfcPoint.classList.add('nfc-success');
+
+    // 更新状态
+    nfcStatus[pointType] = true;
+    updateNFCStatusDisplay();
+
+    showToast(`✅ ${message}成功`, 2000);
+
+    // 移除成功动画
+    setTimeout(() => {
+        nfcPoint.classList.remove('nfc-success');
+    }, 1000);
+}
+
+// 更新打卡状态显示
+function updateNFCStatusDisplay() {
+    if (nfcStatusElement) {
+        const entry = nfcStatus.entry ? '✅ 已入园' : '⭕️ 未入园';
+        const exit = nfcStatus.exit ? '✅ 已离园' : '⭕️ 未离园';
+        nfcStatusElement.textContent = `${entry} | ${exit}`;
     }
 }
 
@@ -214,9 +260,14 @@ async function startPhase1() {
     stateSubtitle.textContent = "正在通过彩虹路...";
     await moveCharacter(childCharacter, MAP_POINTS.road2, 1500);
 
-    // 第三段：彩虹路终点 -> 安全岛
-    stateSubtitle.textContent = "正在通过公园入口...";
-    await moveCharacter(childCharacter, MAP_POINTS.island, 1500);
+    // 第三段：彩虹路终点 -> 公园入口（NFC打卡）
+    stateSubtitle.textContent = "公园入口NFC打卡中...";
+    await moveCharacter(childCharacter, MAP_POINTS.parkEntry, 1000);
+    await triggerNFCCheck('entry');
+
+    // 第四段：公园入口 -> 安全岛
+    stateSubtitle.textContent = "正在前往安全岛...";
+    await moveCharacter(childCharacter, MAP_POINTS.island, 1000);
 
     // 第一阶段完成，进入第二阶段
     await startPhase2();
@@ -286,21 +337,38 @@ async function startPhase4() {
     // 等待1秒
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // 同时移动孩子和守护员到家
-    childCharacter.style.transition = `all 5000ms linear`;
-    guardCharacter.style.transition = `all 5000ms linear`;
+    // 第一步：移动到公园出口（NFC打卡）
+    stateSubtitle.textContent = "公园出口NFC打卡中...";
+    childCharacter.style.transition = `all 2500ms linear`;
+    guardCharacter.style.transition = `all 2500ms linear`;
 
-    childCharacter.style.top = MAP_POINTS.home.top;
-    childCharacter.style.left = MAP_POINTS.home.left;
-    guardCharacter.style.top = MAP_POINTS.home.top;
-    guardCharacter.style.left = MAP_POINTS.home.left;
+    childCharacter.style.top = MAP_POINTS.parkExit.top;
+    childCharacter.style.left = MAP_POINTS.parkExit.left;
+    guardCharacter.style.top = MAP_POINTS.parkExit.top;
+    guardCharacter.style.left = MAP_POINTS.parkExit.left;
 
     // 添加移动动画
     childCharacter.classList.add('moving');
     guardCharacter.classList.add('moving');
 
     // 等待移动完成
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    // NFC打卡
+    await triggerNFCCheck('exit');
+
+    // 第二步：移动到家的位置
+    stateSubtitle.textContent = `${GUARD_INFO.name}正在护送孩子回家`;
+    childCharacter.style.transition = `all 4000ms linear`;
+    guardCharacter.style.transition = `all 4000ms linear`;
+
+    childCharacter.style.top = MAP_POINTS.home.top;
+    childCharacter.style.left = MAP_POINTS.home.left;
+    guardCharacter.style.top = MAP_POINTS.home.top;
+    guardCharacter.style.left = MAP_POINTS.home.left;
+
+    // 等待移动完成
+    await new Promise(resolve => setTimeout(resolve, 4000));
 
     // 移除移动动画
     childCharacter.classList.remove('moving');
@@ -393,6 +461,9 @@ function resetDemo() {
     currentState = APP_STATE.PHASE_0_READY;
     currentTime = 15 * 60; // 15:30
     stayTime = 0;
+    // 重置NFC状态
+    nfcStatus.entry = false;
+    nfcStatus.exit = false;
 
     // 重置角色位置
     childCharacter.style.transition = 'none';
@@ -417,6 +488,15 @@ function resetDemo() {
     childCharacter.classList.remove('breathing', 'moving');
     guardCharacter.classList.remove('moving');
     currentTimeElement.classList.remove('time-accelerating');
+    // 移除NFC点动画类
+    const nfcEntry = document.getElementById('nfc-entry');
+    const nfcExit = document.getElementById('nfc-exit');
+    if (nfcEntry) {
+        nfcEntry.classList.remove('nfc-scanning', 'nfc-success');
+    }
+    if (nfcExit) {
+        nfcExit.classList.remove('nfc-scanning', 'nfc-success');
+    }
 
     // 隐藏模态框
     guardModalOverlay.style.display = 'none';
@@ -428,6 +508,7 @@ function resetDemo() {
     // 更新界面
     updateUIForState(currentState);
     updateTimeDisplay();
+    updateNFCStatusDisplay();
 
     // 强制重绘
     void childCharacter.offsetWidth;
@@ -443,6 +524,7 @@ function init() {
 
     // 设置初始UI状态
     updateUIForState(currentState);
+    updateNFCStatusDisplay();
 
     // 绑定按钮事件
     actionBtn.addEventListener('click', () => {
