@@ -292,7 +292,7 @@ body {
 
 .state-info {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin-bottom: 24px;
     padding: 16px;
@@ -318,6 +318,10 @@ body {
     font-size: 13px;
     color: #666;
     line-height: 1.4;
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .action-section {
@@ -553,4 +557,15 @@ body {
     .state-info { grid-template-columns: 1fr; gap: 8px; }
     .avatar { width: 50px; height: 50px; font-size: 24px; }
     .character-label { font-size: 12px; }
+}
+
+/* 中等屏幕适配 */
+@media (max-width: 768px) and (min-width: 481px) {
+    .state-info { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+/* 小屏幕适配 */
+@media (max-width: 380px) {
+    .info-item span { font-size: 12px; }
+    #nfc-status { font-size: 11px; }
 }
