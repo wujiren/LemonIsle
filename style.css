@@ -235,6 +235,12 @@ body {
     border: 3px solid #64B5F6;
 }
 
+.parent-avatar {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    color: #2E7D32;
+    border: 3px solid #4CAF50;
+}
+
 .character-label {
     background: rgba(255, 255, 255, 0.95);
     padding: 4px 12px;
@@ -318,6 +324,13 @@ body {
     text-align: center;
 }
 
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
 .action-btn {
     width: 100%;
     padding: 18px;
@@ -331,6 +344,10 @@ body {
     transition: all 0.3s ease;
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .action-btn:disabled {
@@ -342,6 +359,15 @@ body {
 .action-btn:not(:disabled):hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+}
+
+.secondary-btn {
+    background: linear-gradient(135deg, #FFB347 0%, #FFCC33 100%);
+    box-shadow: 0 6px 20px rgba(255, 179, 71, 0.4);
+}
+
+.secondary-btn:not(:disabled):hover {
+    box-shadow: 0 8px 24px rgba(255, 179, 71, 0.5);
 }
 
 .action-note {
@@ -420,7 +446,36 @@ body {
 }
 
 .confirm-btn { background: #4CAF50; color: white; }
+.finish-btn { background: #2196F3; color: white; }
 .reset-btn { background: #F1F1F1; color: #333; }
+
+.home-icon {
+    font-size: 60px;
+    color: #2196F3;
+    margin-bottom: 16px;
+}
+
+.message-box {
+    background: #E8F4FD;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: center;
+    border-left: 4px solid #2196F3;
+}
+
+.message-box p {
+    margin: 8px 0;
+    color: #333;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+.message-box p:first-child {
+    font-weight: 600;
+    color: #2196F3;
+    font-size: 16px;
+}
 
 /* 动画特效 */
 @keyframes breathing {

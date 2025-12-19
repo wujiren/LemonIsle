@@ -4,7 +4,8 @@ const APP_STATE = {
     PHASE_1_WALKING: "walking_to_island",   // 放学路上
     PHASE_2_WAITING: "waiting_at_island",   // 岛上玩耍（等待接单）
     PHASE_3_MATCHING: "matching_guard",     // 派单中
-    PHASE_4_ESCORTING: "escorting_home",    // 护送路上
+    PHASE_4_ESCORTING: "escorting_home",    // 守护员护送路上
+    PHASE_SELF_ESCORTING: "self_escorting_home", // 自己接送路上
     PHASE_5_FINISHED: "finished"            // 到家
 };
 
@@ -14,6 +15,7 @@ const MAP_POINTS = {
     island: { top: "45%", left: "50%" },
     home: { top: "80%", left: "80%" },
     guardSpawn: { top: "80%", left: "10%" },
+    parentSpawn: { top: "10%", left: "80%" }, // 家长出生点（右上角）
     // 学校到安全岛的中间点
     road1: { top: "10%", left: "35%" },   // 校门路终点（水平道路终点）
     road2: { top: "40%", left: "50%" }    // 彩虹路终点
@@ -37,6 +39,7 @@ let currentState = APP_STATE.PHASE_0_READY;
 // DOM元素
 const childCharacter = document.getElementById('child-character');
 const guardCharacter = document.getElementById('guard-character');
+const parentCharacter = document.getElementById('parent-character');
 const actionBtn = document.getElementById('action-btn');
 const btnText = document.getElementById('btn-text');
 const stateTitle = document.getElementById('state-title');
@@ -48,9 +51,15 @@ const stayTimeElement = document.getElementById('stay-time');
 const actionNote = document.getElementById('action-note');
 const toast = document.getElementById('toast');
 const toastMessage = document.getElementById('toast-message');
-const modalOverlay = document.getElementById('modal-overlay');
+const guardModalOverlay = document.getElementById('guard-modal-overlay');
+const parentModalOverlay = document.getElementById('parent-modal-overlay');
 const resetBtn = document.getElementById('reset-btn');
+const parentResetBtn = document.getElementById('parent-reset-btn');
 const confirmBtn = document.getElementById('confirm-btn');
+const finishBtn = document.getElementById('finish-btn');
+const selfPickupBtn = document.getElementById('self-pickup-btn');
+const selfPickupText = document.getElementById('self-pickup-text');
+const parentArrivalTime = document.getElementById('parent-arrival-time');
 
 // 工具函数：格式化时间 (HH:MM)
 function formatTime(minutes) {
@@ -99,6 +108,7 @@ function updateUIForState(state) {
             statusText.textContent = "等待开始";
             actionBtn.disabled = false;
             btnText.textContent = "开始演示";
+            selfPickupBtn.style.display = 'none';
             actionNote.textContent = "演示将模拟孩子从学校到安全岛再到家的全过程";
             break;
 
@@ -109,7 +119,8 @@ function updateUIForState(state) {
             statusText.textContent = "放学路上";
             actionBtn.disabled = true;
             btnText.textContent = "孩子行进中";
-            actionNote.textContent = "等待孩子到达安全岛后可呼叫守护员";
+            selfPickupBtn.style.display = 'none';
+            actionNote.textContent = "等待孩子到达安全岛后选择接送方式";
             break;
 
         case APP_STATE.PHASE_2_WAITING:
@@ -119,7 +130,10 @@ function updateUIForState(state) {
             statusText.textContent = "岛上玩耍";
             actionBtn.disabled = false;
             btnText.textContent = "呼叫守护员接送 ¥15";
-            actionNote.textContent = "点击按钮呼叫守护员接孩子回家";
+            selfPickupBtn.disabled = false;
+            selfPickupText.textContent = "自己接送回家";
+            selfPickupBtn.style.display = 'flex';
+            actionNote.textContent = "请选择接送方式";
 
             // 添加呼吸灯效果
             childCharacter.classList.add('breathing');
@@ -132,6 +146,7 @@ function updateUIForState(state) {
             statusText.textContent = "派单中";
             actionBtn.disabled = true;
             btnText.textContent = "正在派单...";
+            selfPickupBtn.style.display = 'none';
             actionNote.textContent = "正在为您匹配最近的守护员";
             break;
 
@@ -142,10 +157,22 @@ function updateUIForState(state) {
             statusText.textContent = "护送路上";
             actionBtn.disabled = true;
             btnText.textContent = "护送中...";
+            selfPickupBtn.style.display = 'none';
             actionNote.textContent = "守护员正在护送孩子回家，预计5分钟到达";
 
             // 移除呼吸灯效果
             childCharacter.classList.remove('breathing');
+            break;
+
+        case APP_STATE.PHASE_SELF_ESCORTING:
+            stateIcon.textContent = "👨‍👦";
+            stateTitle.textContent = "自己接送中";
+            stateSubtitle.textContent = "正在护送孩子回家";
+            statusText.textContent = "护送路上";
+            actionBtn.disabled = true;
+            btnText.textContent = "护送中...";
+            selfPickupBtn.style.display = 'none';
+            actionNote.textContent = "正在护送孩子回家，预计5分钟到达";
             break;
 
         case APP_STATE.PHASE_5_FINISHED:
@@ -155,6 +182,7 @@ function updateUIForState(state) {
             statusText.textContent = "已到家";
             actionBtn.disabled = true;
             btnText.textContent = "服务完成";
+            selfPickupBtn.style.display = 'none';
             actionNote.textContent = "感谢使用联萌岛安全护送服务";
             break;
     }
@@ -279,23 +307,82 @@ async function startPhase4() {
     guardCharacter.classList.remove('moving');
 
     // 进入第五阶段：完成
-    await startPhase5();
+    await startPhase5('guard');
+}
+
+// 自己接送流程
+async function startSelfPickup() {
+    console.log("开始自己接送流程");
+    currentState = APP_STATE.PHASE_SELF_ESCORTING;
+    updateUIForState(currentState);
+
+    // 移除呼吸灯效果
+    childCharacter.classList.remove('breathing');
+
+    // 显示通知
+    showToast("👨‍👦 家长出发前往安全岛接孩子");
+
+    // 显示家长
+    parentCharacter.style.display = 'flex';
+
+    // 等待1秒
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // 家长移动到安全岛
+    showToast("🚗 家长正在前往安全岛...");
+    await moveCharacter(parentCharacter, MAP_POINTS.island, 3000);
+
+    // 家长接到孩子，隐藏孩子
+    showToast("✅ 家长已接到孩子");
+    childCharacter.style.display = 'none';
+
+    // 等待1秒
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // 家长带孩子回家
+    showToast("🏠 家长带孩子回家中...");
+    parentCharacter.style.transition = `all 5000ms linear`;
+    parentCharacter.style.top = MAP_POINTS.home.top;
+    parentCharacter.style.left = MAP_POINTS.home.left;
+    parentCharacter.classList.add('moving');
+
+    // 等待移动完成
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    // 移除移动动画
+    parentCharacter.classList.remove('moving');
+
+    // 进入第五阶段：完成
+    await startPhase5('parent');
 }
 
 // 第五阶段：完成
-async function startPhase5() {
-    console.log("开始第五阶段：完成");
+// mode: 'guard' 守护员护送 | 'parent' 家长自己接送
+async function startPhase5(mode = 'guard') {
+    console.log(`开始第五阶段：完成 (模式: ${mode})`);
     currentState = APP_STATE.PHASE_5_FINISHED;
     updateUIForState(currentState);
 
-    // 隐藏守护员
+    // 隐藏守护员和家长，显示孩子（已到家状态）
     guardCharacter.style.display = 'none';
+    parentCharacter.style.display = 'none';
+    childCharacter.style.display = 'flex';
+    childCharacter.style.top = MAP_POINTS.home.top;
+    childCharacter.style.left = MAP_POINTS.home.left;
 
-    // 显示完成模态框
-    modalOverlay.style.display = 'flex';
-
-    // 显示最终通知
-    showToast("🎉 孩子已安全到家！服务完成", 5000);
+    // 根据模式显示不同的模态框
+    if (mode === 'parent') {
+        // 家长自己接送模式
+        // 设置到达时间（当前时间 + 5分钟）
+        const arrivalMinutes = currentTime + 5;
+        parentArrivalTime.textContent = formatTime(arrivalMinutes);
+        parentModalOverlay.style.display = 'flex';
+        showToast("🏠 家长接送完成！孩子已安全到家", 5000);
+    } else {
+        // 守护员护送模式
+        guardModalOverlay.style.display = 'flex';
+        showToast("🎉 孩子已安全到家！服务完成", 5000);
+    }
 }
 
 // 重置演示
@@ -310,14 +397,21 @@ function resetDemo() {
     // 重置角色位置
     childCharacter.style.transition = 'none';
     guardCharacter.style.transition = 'none';
+    parentCharacter.style.transition = 'none';
 
     childCharacter.style.top = MAP_POINTS.school.top;
     childCharacter.style.left = MAP_POINTS.school.left;
     guardCharacter.style.top = MAP_POINTS.guardSpawn.top;
     guardCharacter.style.left = MAP_POINTS.guardSpawn.left;
+    parentCharacter.style.top = MAP_POINTS.parentSpawn.top;
+    parentCharacter.style.left = MAP_POINTS.parentSpawn.left;
 
-    // 隐藏守护员
+    // 显示孩子，隐藏守护员和家长
+    childCharacter.style.display = 'flex';
     guardCharacter.style.display = 'none';
+    parentCharacter.style.display = 'none';
+    // 隐藏自己接送按钮
+    selfPickupBtn.style.display = 'none';
 
     // 移除所有动画类
     childCharacter.classList.remove('breathing', 'moving');
@@ -325,7 +419,8 @@ function resetDemo() {
     currentTimeElement.classList.remove('time-accelerating');
 
     // 隐藏模态框
-    modalOverlay.style.display = 'none';
+    guardModalOverlay.style.display = 'none';
+    parentModalOverlay.style.display = 'none';
 
     // 隐藏通知
     toast.style.display = 'none';
@@ -358,10 +453,23 @@ function init() {
         }
     });
 
+    selfPickupBtn.addEventListener('click', () => {
+        if (currentState === APP_STATE.PHASE_2_WAITING) {
+            startSelfPickup();
+        }
+    });
+
     resetBtn.addEventListener('click', resetDemo);
 
     confirmBtn.addEventListener('click', () => {
         alert("支付成功！感谢使用联萌岛服务。");
+        resetDemo();
+    });
+
+    parentResetBtn.addEventListener('click', resetDemo);
+
+    finishBtn.addEventListener('click', () => {
+        showToast("✅ 家长接送完成！感谢使用联萌岛", 3000);
         resetDemo();
     });
 
