@@ -35,8 +35,8 @@ body {
 
 /* 顶部通知条 */
 .toast {
-    position: absolute;
-    top: 50px;
+    position: fixed;
+    top: 20px;
     left: 0;
     right: 0;
     background: rgba(255, 255, 255, 0.95);
@@ -483,15 +483,19 @@ body {
 .nfc-point {
     position: absolute;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    gap: 8px;
     transform: translate(-50%, -50%);
     z-index: 30;
 }
 
+.nfc-point.park-entry {
+    flex-direction: row-reverse;
+}
+
 .nfc-icon {
     font-size: 28px;
-    margin-bottom: 4px;
     animation: nfcPulse 2s ease-in-out infinite;
 }
 
