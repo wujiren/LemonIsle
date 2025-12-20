@@ -20,7 +20,7 @@ const MAP_POINTS = {
     road1: { top: "10%", left: "35%" },   // 校门路终点（水平道路终点）
     road2: { top: "40%", left: "50%" },    // 彩虹路终点
     // NFC打卡点
-    parkEntry: { top: "47.5%", left: "50%" },  // 公园入口 NFC打卡点（安全岛左上方）
+    parkEntry: { top: "40%", left: "45%" },  // 公园入口 NFC打卡点（安全岛左上方）
     parkExit: { top: "58%", left: "65%" }      // 公园出口 NFC打卡点（更靠近安全岛）
 };
 
