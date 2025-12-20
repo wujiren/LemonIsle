@@ -292,12 +292,18 @@ body {
 
 .state-info {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
     margin-bottom: 24px;
     padding: 16px;
     background: #F8F9FA;
     border-radius: 16px;
+}
+
+.info-item:nth-child(4) {
+    grid-column: 1 / span 3;
+    justify-self: center;
+    width: 66.66%;
 }
 
 .info-item {
@@ -554,18 +560,38 @@ body {
 
 /* 响应式适配 */
 @media (max-width: 480px) {
-    .state-info { grid-template-columns: 1fr; gap: 8px; }
+    .state-info {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .info-item:nth-child(4) {
+        grid-column: span 1;
+        justify-self: stretch;
+        width: auto;
+    }
     .avatar { width: 50px; height: 50px; font-size: 24px; }
     .character-label { font-size: 12px; }
 }
 
 /* 中等屏幕适配 */
 @media (max-width: 768px) and (min-width: 481px) {
-    .state-info { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .state-info {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .info-item:nth-child(4) {
+        grid-column: 1 / span 2;
+        justify-self: center;
+        width: 100%;
+    }
 }
 
 /* 小屏幕适配 */
 @media (max-width: 380px) {
     .info-item span { font-size: 12px; }
     #nfc-status { font-size: 11px; }
+    .state-info {
+        padding: 12px;
+        gap: 8px;
+    }
 }
