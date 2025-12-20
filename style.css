@@ -292,18 +292,12 @@ body {
 
 .state-info {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-bottom: 24px;
     padding: 16px;
     background: #F8F9FA;
     border-radius: 16px;
-}
-
-.info-item:nth-child(4) {
-    grid-column: 1 / span 3;
-    justify-self: center;
-    width: 66.66%;
 }
 
 .info-item {
@@ -324,7 +318,6 @@ body {
     font-size: 13px;
     color: #666;
     line-height: 1.4;
-    white-space: nowrap;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -564,11 +557,7 @@ body {
         grid-template-columns: 1fr;
         gap: 8px;
     }
-    .info-item:nth-child(4) {
-        grid-column: span 1;
-        justify-self: stretch;
-        width: auto;
-    }
+
     .avatar { width: 50px; height: 50px; font-size: 24px; }
     .character-label { font-size: 12px; }
 }
@@ -579,11 +568,7 @@ body {
         grid-template-columns: 1fr 1fr;
         gap: 10px;
     }
-    .info-item:nth-child(4) {
-        grid-column: 1 / span 2;
-        justify-self: center;
-        width: 100%;
-    }
+
 }
 
 /* 小屏幕适配 */
