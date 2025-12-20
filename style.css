@@ -329,7 +329,7 @@ body {
 
 .button-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
     margin-bottom: 12px;
 }
@@ -341,12 +341,11 @@ body {
     border-radius: 16px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -554,7 +553,7 @@ body {
 /* 响应式适配 */
 @media (max-width: 480px) {
     .state-info {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
 

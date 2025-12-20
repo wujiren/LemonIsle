@@ -121,9 +121,15 @@ async function triggerNFCCheck(pointType) {
 // 更新打卡状态显示
 function updateNFCStatusDisplay() {
     if (nfcStatusElement) {
-        const entry = nfcStatus.entry ? '✅ 已入园' : '⭕️ 未入园';
-        const exit = nfcStatus.exit ? '✅ 已离园' : '⭕️ 未离园';
-        nfcStatusElement.textContent = `${entry} | ${exit}`;
+        let statusMessage = '';
+        if (nfcStatus.exit) {
+            statusMessage = '✅ 已离园';
+        } else if (nfcStatus.entry) {
+            statusMessage = '✅ 已入园';
+        } else {
+            statusMessage = '⭕️ 未打卡';
+        }
+        nfcStatusElement.textContent = statusMessage;
     }
 }
 
