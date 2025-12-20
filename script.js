@@ -21,7 +21,7 @@ const MAP_POINTS = {
     road2: { top: "40%", left: "50%" },    // 彩虹路终点
     // NFC打卡点
     parkEntry: { top: "47.5%", left: "50%" },  // 公园入口 NFC打卡点（安全岛左上方）
-    parkExit: { top: "55%", left: "60%" }      // 公园出口 NFC打卡点（更靠近安全岛）
+    parkExit: { top: "58%", left: "65%" }      // 公园出口 NFC打卡点（更靠近安全岛）
 };
 
 // 守护员信息
